@@ -1,0 +1,310 @@
+#
+# Panther sensor device configuration registry script for EVT wingboard stage.
+#
+# Source of truth: go/pixel-sensor-list
+#
+
+#
+# CDT Filter <CDT>:<mask>
+# CDT format: <0xPPPPSJIV> (P:Product, S:Stage, J:Major, I:Minor, V:Variant)
+# go/pixel-cdt-whi-pro
+#
+
+?+0x43102 0x43111  # EVT 1.0 and 1.1 wingboard
+
+#
+# Record reg_script.
+#
+
++/
+reg_script=panther_evt_win.reg
+
+#
+# Buses
+#
+
+# I2C
++/dev/i2c/0
+  bus_name=i2c0
+  bus_index=0
+
+# I3C
++/dev/i3c/2
+  bus_name=i3c2
+  bus_index=2
+
+# SPI
++/dev/spi/0
+  bus_name=spi0
+  bus_index=0
+
+# PDM
++/dev/pdm
+  base_clk_hz=24576000
+
+#
+# Sensors
+#
+
+# IMU (LSM6DSV)
++/dev/lsm6dsv/0
+  bus_name=i3c2
+  bus_freq_hz=400000
+  i3c_freq_hz=1230000
+  bus_addr=0x6a
+  i3c_addr=0xa
+  intr_id=47
+  trigger_type=2
+  fifo_enabled=1
+  md_threshold_m_per_s_sq=1.2264
+  md_window_ms=20
+  sd_window_ms=5000
+  fifo_max_odr=4000
+  fifo_max_wm=245
+  fifo_min_wm=1
+  gpio_id=gpio90
++/dev/lsm6dsv/0/accel
+  orientation_transform=-2 1 3
++/dev/lsm6dsv/0/gyro
+  orientation_transform=-2 1 3
++/dev/lsm6dsv/0/temp
+
+# MAG (MMC5633NJ)
++/dev/mmc56x3x/0
+  bus_name=i3c2
+  bus_freq_hz=400000
+  i3c_freq_hz=1230000
+  bus_addr=0x30
+  i3c_addr=0x14
+  priority=0
++/dev/mmc56x3x/0/mag
+  orientation_transform=2 1 -3
+  fac_cal_transform=0.9342 0.0067 -0.0012 0.0513 0.9118 0.0481 0.0602 0.0298 1.1271 0.0 0.0 0.0
+  name=MMC56X3X Magnetometer
+
+# BARO (ICP20100)
++/dev/icp20100/0
+  bus_name=i2c0
+  bus_freq_hz=400000
+  bus_addr=0x63
+  intr_id=37
+  min_period_us=25000
++/dev/icp20100/0/baro
++/dev/icp20100/0/temp
+
+# ALSP1 (TMD37193)
++/dev/tmd3719/0
+  bus_name=i2c0
+  bus_freq_hz=400000
+  bus_addr=0x39
+  intr_id=15
+  sync_delay_ns=1195227
+  # falling edge = 0, rising edge = 1
+  te2_alignment=0
+  anti_aliasing=1
++/dev/tmd3719/0/als
+  lux_scale=2.272701
+  c_coef=1
+  r_coef=-0.765091
+  g_coef=0.986515
+  b_coef=-1.221424
+  itime_table_brightness=100 200 300 400 2048
+  itime_table=1917861 1478408 1019966 577800 181750
+  max_gain_table=11 10 10 9 8
+  fast_filter_size=10
+  slow_filter_size=100
+  aod_fast_filter_size=2
+  aod_slow_filter_size=2
+  max_lux=160000
+  # Number of EM cycles in a 60Hz frame.
+  EM_cycle_count_60Hz=6
+  # Step-size (in EM slots) for each rotation.
+  rotation_step_size=1
+  new_gain_ratio=1
+
+  clear_gain11_ratio=0.11625535387073455
+  red_gain11_ratio=0.11494924504976897
+  green_gain11_ratio=0.11410777377297202
+  blue_gain11_ratio=0.11436384033562808
+
+  clear_gain10_ratio=0.2429366201591872
+  red_gain10_ratio=0.2417615451458759
+  green_gain10_ratio=0.2411461883740554
+  blue_gain10_ratio=0.24135573586873238
+
+  clear_gain9_ratio=0.49537377596374205
+  red_gain9_ratio=0.4944763017620627
+  green_gain9_ratio=0.49411826809132353
+  blue_gain9_ratio=0.49421853876085087
+
+  clear_gain7_ratio=2.007158703756766
+  red_gain7_ratio=2.0094122647224655
+  green_gain7_ratio=2.0101826273507655
+  blue_gain7_ratio=2.0101143454281263
+
+  clear_gain6_ratio=4.018255323395394
+  red_gain6_ratio=4.026196393396218
+  green_gain6_ratio=4.0287260772874784
+  blue_gain6_ratio=4.028533405049345
+
++/dev/tmd3719/0/prox
+  auto_baseline=1
+  burst_delay_60hz=175
+  burst_delay_90hz=145
+  burst_delay_aod=0
+  hxtalk=1
+  pulse_count=1
+  vcsel_ma=10
+  pd0_far_threshold=30
+  pd0_near_threshold=50
+  pd1_far_threshold=40
+  pd1_near_threshold=55
+  # "Low power" operating parameters.
+  pulse_len_us=32
+  filter_len=4
+  skip_count=0
+  pdata0_scale=1.600854
+  pdata1_scale=1.341832
+  gain0=4
+  gain1=8
+  # "High power" operating parameters.
+  hp_pulse_len_us=128
+  hp_filter_len=1
+  hp_skip_count=0
+  hp_pdata0_scale=1.571915
+  hp_pdata1_scale=1.326553
+  hp_pdata0_offset=8.44
+  hp_pdata1_offset=25.624
+  hp_gain0=1
+  hp_gain1=2
+  # High power only if value > 0.
+  high_power_mode_only=1
+
+# Display Info
++/dev/display_info/0
+  # Maximum panel refresh rate.
+  panel_max_rr=90
+  # Link to ALS attached to this display.
+  attached_alsp=/dev/tmd3719/0
+
+# RAINBOW (VD6282)
++/dev/vd6282/0
+  bus_name=i2c0
+  bus_freq_hz=400000
+  bus_addr=0x20
+  pdm_id=4
+  pcm_rate_hz=24000
++/dev/vd6282/0/spectral
+  auto_gain=1
+  # Golden values for calibration.
+  golden_rals_r=944
+  golden_rals_g=1091
+  golden_rals_b=251
+  golden_rals_clr1=4667
+  golden_rals_ir=2705
+  golden_rals_clr2=4675
+  # On-change thresholds for each color channel c: min_delta[c] ratio[c].
+  # A value of -1 disables a threshold.
+  # Change events are determined as follows:
+  #  last_count[c]: the last sample count for each channel c
+  #  count[c]: the current sample count for each channel c
+  #   => delta[c] = abs(last_count[c] - count[c])
+  #  thresh[c] = max(min_delta[c], last_count[c] * ratio[c])
+  #  if delta[c] > thresh[c] for any channel c:
+  #    Send a new sample with all current channel counts
+  r_change_thresh=-1 -1
+  g_change_thresh=100 0.1
+  b_change_thresh=-1 -1
+  c1_change_thresh=100 0.1
+  c2_change_thresh=-1 -1
+  ir_change_thresh=-1 -1
++/dev/vd6282/0/rls
+  lux_scale=112.6306141
+  fix_fac_cal=1
++/dev/vd6282/0/flicker
+  auto_gain=1
+
+# Camera VSYNC
++/dev/camera_vsync/0 # rear telephoto
+  intr_id=56
+  intr_trigger_type=2
++/dev/camera_vsync/1 # rear ultra-wide-angle
+  intr_id=57
+  intr_trigger_type=2
++/dev/camera_vsync/2 # front
+  intr_id=58
+  intr_trigger_type=2
++/dev/camera_vsync/3 # rear
+  intr_id=59
+  intr_trigger_type=2
+
+# TOUCH (FT3658)
++/dev/ft3658/0
+  bus_name=spi0
+  # Set spi clock to 1 MHz
+  bus_freq_hz=1000000
+  spi_mode=0
+  spi_word_size=8
+  cs_gpio=52
+  cs_clock_delay_us=1
+  # 1 = double tap
+  # 2 = single tap
+  # 3 = long press
+  # 4 = single tap and long press
+  gesture_type=4
+  intr_id=17
+  #Falling Trigger interrupt
+  intr_type=3
+  single_tap_min_x=90
+  single_tap_max_x=989
+  single_tap_min_y=180
+  single_tap_max_y=2219
+  single_tap_min_frame_count=1
+  single_tap_max_frame_count=31
+  single_press_motion_tolerance=255
+  single_press_max_touch_size=50
+  # LPTW v1 parameters (common)
+  long_press_min_x=434
+  long_press_max_x=646
+  long_press_min_y=1678
+  long_press_max_y=1819
+  long_press_min_frame_count=3
+  long_press_motion_tolerance_inner=255
+  long_press_max_touch_size=50
+  # LPTW v2 parameters (extension)
+  long_press_marginal_min_x=41
+  long_press_marginal_max_x=41
+  long_press_marginal_min_y=41
+  long_press_marginal_max_y=41
+  long_press_monitor_channel_min_tx=6
+  long_press_monitor_channel_max_tx=9
+  long_press_monitor_channel_min_rx=22
+  long_press_monitor_channel_max_rx=25
+  long_press_min_node_count=6
+  long_press_motion_tolerance_outer=540
+  mm2px=8
+
+# TBN
++/tbn
+  tbn_mode=1
+  ap2aoc_intr_id=44
+  ap2aoc_intr_type=4
+  ap2aoc_gpio_id=gpio87
+  aoc2ap_gpio_id=gpio74
+
+# VSC.
++/vsc
+  quick_pick_up_enable=1
+  single_tap_enable=1
+  long_press_enable=1
+
++/vsc/auto_brightness
+  # float[3]={LuxToEnter, LuxToExit, RemappedLux}
+  lux_remap=-1.0 -1.0 -1.0
+  # float[3]={MinDelta, MaxDelta, LuxRatio}
+  lux_debounce_up=1 5000 0.15
+  lux_debounce_down=0.1 5000 0.1
+  # ALS[2], RLS[2], Fusion[2], each containing <maxSampleAgeMsec> and <maxNumOfSamples>
+  filter_configs=500 60 500 30 500 90
+  # float[3]={zeroPoint, onePoint, endPoint}, set to 0 to disable
+  rear_lux_downscaling=0 0 0
